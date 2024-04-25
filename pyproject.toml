@@ -12,6 +12,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 numpy = "^1.26.4"
+opencv-python = "^4.9.0.80"
 
 [tool.poetry.scripts]
 main = "twm_proj.main:main"
