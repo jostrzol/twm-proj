@@ -1,4 +1,4 @@
-# TWM project -- Licence plate detector
+# Licence plate detector (TWM project)
 
 ## Installation
 
