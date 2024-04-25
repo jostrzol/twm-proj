@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "twm-proj"
+version = "0.1.0"
+description = ""
+authors = [
+  "Jakub Ostrzołek <jakub.ostrzolek.stud@pw.edu.pl>",
+  "Igor Anczykowski <igor.anczykowski.stud@pw.edu.pl>",
+  "Jakub Winter <jakub.winter.stud@pw.edu.pl>"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.scripts]
+main = "twm_proj.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
