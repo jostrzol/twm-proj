@@ -50,8 +50,8 @@ class LicencePlateDetector:
             if rect is None:
                 continue
             rect_image = self._rect_transformer.transform(image, rect)
-            rect_type = self._rect_classifier.classify(rect_image.size)
+            rect_type = self._rect_classifier.classify(rect_image.shape)
             if rect_type == RectangleType.NOT_PLATE:
                 continue
-            text = self._ocr.scan_text(rect_image.image)
-            yield LicencePlate(contour=contour, image=rect_image.image, text=text)
+            text = self._ocr.scan_text(rect_image)
+            yield LicencePlate(contour=contour, image=rect_image, text=text)
