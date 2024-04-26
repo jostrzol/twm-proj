@@ -3,8 +3,8 @@ from enum import Enum, auto
 
 
 class RectangleType(Enum):
-    ONE_ROW = auto()
-    TWO_ROW = auto()
+    ONE_ROW_PLATE = auto()
+    TWO_ROW_PLATE = auto()
     NOT_PLATE = auto()
 
 
