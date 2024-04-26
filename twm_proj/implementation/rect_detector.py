@@ -1,9 +1,8 @@
-from typing import Any
+import numpy as np
 
 from twm_proj.interface.rect_detector import IRectDetector, SlantedRectangle
 
 
 class RectDetector(IRectDetector):
-    # TODO: specify contour type
-    def detect(self, contour: Any) -> SlantedRectangle | None:
+    def detect(self, contour: np.ndarray) -> SlantedRectangle | None:
         raise NotImplementedError()
