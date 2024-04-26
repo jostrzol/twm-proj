@@ -10,11 +10,9 @@ class Ocr(IOcr):
     def scan_text(self, image: np.ndarray) -> str:
         # Grayscale image
         img = image.convert("L")
-        ret, img = cv2.threshold(np.array(img), 125, 255, cv2.THRESH_BINARY)
+        _, img = cv2.threshold(np.array(img), 125, 255, cv2.THRESH_BINARY)
         img = Image.fromarray(img.astype(np.uint8))
         return pytesseract.image_to_string(
             image,
             config="--psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.%",
         )
-
-        raise NotImplementedError()
