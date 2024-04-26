@@ -3,8 +3,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from twm_proj.interface.rect_detector import SlantedRectangle
-
 
 @dataclass
 class RectangleImage:
@@ -14,5 +12,5 @@ class RectangleImage:
 
 class IRectTransformer(metaclass=ABCMeta):
     def transform(
-        self, image: np.ndarray, rect: SlantedRectangle
+        self, image: np.ndarray, rect: np.ndarray
     ) -> RectangleImage: ...

@@ -1,5 +1,5 @@
 from typing import Any, BinaryIO, Generator
-from twm_proj.interface.rect_detector import IRectDetector, SlantedRectangle
+from twm_proj.interface.rect_detector import IRectDetector
 from twm_proj.interface.edge_filter import IEdgeFilter
 from twm_proj.interface.contour_detector import IContourDetector
 from twm_proj.interface.image_reader import IImageReader
@@ -15,7 +15,7 @@ import numpy as np
 
 @dataclass
 class LicencePlate:
-    contour: SlantedRectangle
+    contour: np.ndarray
     image: np.ndarray
     text: str
 
