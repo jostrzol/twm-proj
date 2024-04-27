@@ -15,6 +15,12 @@ class RectClassifier(IRectClassifier):
     EPSILON = 0.18
 
     def classify(self, rect: np.ndarray) -> RectangleType:
+        typ, _ = self.classify_with_differences(rect)
+        return typ
+
+    def classify_with_differences(
+        self, rect: np.ndarray
+    ) -> tuple[RectangleType, dict[RectangleType, float]]:
         [height, width, *_] = rect.shape
         aspect = width / height
         relative_differences = {
@@ -24,4 +30,5 @@ class RectClassifier(IRectClassifier):
         best_type, best_difference = min(
             relative_differences.items(), key=lambda pair: pair[1]
         )
-        return best_type if best_difference <= self.EPSILON else RectangleType.NOT_PLATE
+        typ = best_type if best_difference <= self.EPSILON else RectangleType.NOT_PLATE
+        return typ, relative_differences
