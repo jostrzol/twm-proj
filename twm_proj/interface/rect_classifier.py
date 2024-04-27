@@ -5,6 +5,7 @@ from enum import Enum, auto
 class RectangleType(Enum):
     ONE_ROW_PLATE = auto()
     TWO_ROW_PLATE = auto()
+    MINI_PLATE = auto()
     NOT_PLATE = auto()
 
 
