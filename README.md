@@ -3,6 +3,7 @@
 ## Installation
 
 ```sh
+sudo sudo apt-get install tesseract-ocr
 poetry install
 ```
 

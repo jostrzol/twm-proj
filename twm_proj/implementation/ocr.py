@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import pytesseract  # also required: sudo apt-get install tesseract-ocr
+import pytesseract
 
 from twm_proj.interface.ocr import IOcr
 
