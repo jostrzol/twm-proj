@@ -1,4 +1,10 @@
-from argparse import ArgumentParser, FileType
+import dataclasses
+import json
+import sys
+
+import numpy as np
+
+from argparse import ArgumentParser
 from twm_proj.implementation.contour_detector import ContourDetector
 from twm_proj.implementation.edge_filter import EdgeFilter
 from twm_proj.implementation.image_reader import ImageReader
@@ -8,12 +14,12 @@ from twm_proj.implementation.rect_classifier import RectClassifier
 from twm_proj.implementation.rect_detector import RectDetector
 from twm_proj.implementation.rect_transformer import RectTransformer
 
-from twm_proj.licence_plate_detector import LicencePlateDetector
+from twm_proj.licence_plate_detector import LicencePlateDetector, LicencePlate
 
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("files", type=FileType("rb"), nargs="+")
+    parser.add_argument("files", nargs="+")
     args = parser.parse_args()
 
     detector = LicencePlateDetector(
@@ -27,9 +33,25 @@ def main():
         ocr=Ocr(),
     )
 
-    for file in args.files:
-        plates = [*detector.detect(file)]
-        print([plate.text for plate in plates])
+    for path in args.files:
+        with open(path, "rb") as file:
+            plates = [*detector.detect(file)]
+        result = {"file": path, "plates": plates}
+        json.dump(result, sys.stdout, cls=CustomJSONEncoder)
+        print()
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, LicencePlate):
+            dict = dataclasses.asdict(o)
+            dict.pop("image")
+            return dict
+        elif dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
+        return super().default(o)
 
 
 if __name__ == "__main__":

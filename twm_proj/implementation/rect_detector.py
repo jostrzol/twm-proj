@@ -10,4 +10,4 @@ class RectDetector(IRectDetector):
         rect = cv2.approxPolyDP(contour, epsilon=70.0, closed=True)
         if len(rect) != 4:
             return None
-        return rect
+        return rect.reshape(-1, 2)

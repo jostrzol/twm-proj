@@ -15,9 +15,9 @@ import numpy as np
 
 @dataclass
 class LicencePlate:
-    contour: np.ndarray
-    image: np.ndarray
     text: str
+    rect: np.ndarray
+    image: np.ndarray
 
 
 class LicencePlateDetector:
@@ -54,4 +54,4 @@ class LicencePlateDetector:
             if rect_type == RectangleType.NOT_PLATE:
                 continue
             text = self._ocr.scan_text(rect_image)
-            yield LicencePlate(contour=contour, image=rect_image, text=text)
+            yield LicencePlate(rect=rect, image=rect_image, text=text)
