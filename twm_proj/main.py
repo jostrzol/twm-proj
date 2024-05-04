@@ -10,6 +10,7 @@ from twm_proj.implementation.edge_filter import EdgeFilter
 from twm_proj.implementation.image_reader import ImageReader
 from twm_proj.implementation.initial_filter import InitialFilter
 from twm_proj.implementation.ocr import Ocr
+from twm_proj.implementation.pre_ocr import PreOcr
 from twm_proj.implementation.rect_classifier import RectClassifier
 from twm_proj.implementation.rect_detector import RectDetector
 from twm_proj.implementation.rect_transformer import RectTransformer
@@ -31,6 +32,7 @@ def main():
         rect_transformer=RectTransformer(),
         rect_classifier=RectClassifier(),
         ocr=Ocr(),
+        pre_ocr=PreOcr()
     )
 
     for path in args.files:

@@ -5,6 +5,7 @@ from twm_proj.interface.contour_detector import IContourDetector
 from twm_proj.interface.image_reader import IImageReader
 from twm_proj.interface.initial_filter import IInitialFilter
 from twm_proj.interface.ocr import IOcr
+from twm_proj.interface.pre_ocr import IPreOcr
 from twm_proj.interface.rect_classifier import IRectClassifier, RectangleType
 from twm_proj.interface.rect_transformer import IRectTransformer
 
@@ -30,6 +31,7 @@ class LicencePlateDetector:
         rect_detector: IRectDetector,
         rect_transformer: IRectTransformer,
         rect_classifier: IRectClassifier,
+        pre_ocr: IPreOcr,
         ocr: IOcr,
     ):
         self._image_reader = image_reader
@@ -40,6 +42,7 @@ class LicencePlateDetector:
         self._rect_transformer = rect_transformer
         self._rect_classifier = rect_classifier
         self._ocr = ocr
+        self._pre_ocr = pre_ocr
 
     def detect(self, image_file: BinaryIO) -> Generator[LicencePlate, Any, None]:
         image = self._image_reader.read(image_file)
@@ -53,5 +56,7 @@ class LicencePlateDetector:
             rect_type = self._rect_classifier.classify(rect_image)
             if rect_type == RectangleType.NOT_PLATE:
                 continue
-            text = self._ocr.scan_text(rect_image)
+            ocr_filtered_image = self._pre_ocr.cut(rect_image)
+            ocr_filtered_image = self._pre_ocr.to_grayscale(ocr_filtered_image)
+            text = self._ocr.scan_text(ocr_filtered_image)
             yield LicencePlate(rect=rect, image=rect_image, text=text)
