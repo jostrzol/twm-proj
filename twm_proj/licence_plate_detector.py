@@ -56,7 +56,8 @@ class LicencePlateDetector:
             rect_type = self._rect_classifier.classify(rect_image)
             if rect_type == RectangleType.NOT_PLATE:
                 continue
-            ocr_filtered_image = self._pre_ocr.cut(rect_image)
-            ocr_filtered_image = self._pre_ocr.to_grayscale(ocr_filtered_image)
-            text = self._ocr.scan_text(ocr_filtered_image)
+            ocr_image_cut = self._pre_ocr.cut(rect_image)
+            ocr_image_grayscale = self._pre_ocr.to_grayscale(ocr_image_cut)
+            ocr_image_filtered = self._pre_ocr.filter_by_size(ocr_image_grayscale)
+            text = self._ocr.scan_text(ocr_image_filtered)
             yield LicencePlate(rect=rect, image=rect_image, text=text)
