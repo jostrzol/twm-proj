@@ -8,24 +8,47 @@ class PreOcr(IPreOcr):
 
     def cut(self, image: np.ndarray) -> np.ndarray:
         # TODO: cut based on plate shape type
-        left = 25
+        left = 20
         right = 5
         top = 10
         bottom = 8
         return image[top:-bottom, left:-right]
 
     def to_grayscale(self, image: np.ndarray) -> np.ndarray:
+        image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, img = cv2.threshold(gray, 125, 255, cv2.THRESH_BINARY)
+        _, img = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
         return img
+
+    def _convert_reds(self, image: np.ndarray) -> np.ndarray:
+        # Converts reds to blacks (special case for temporary plates)
+        # Because of this, we can use stronger treshold
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        lower_red = np.array([0, 55, 50])
+        upper_red = np.array([25, 255, 255])
+        lower_red2 = np.array([160, 55, 100])
+        upper_red2 = np.array([190, 255, 255])
+        mask1 = cv2.inRange(hsv, lower_red, upper_red)
+        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        mask = cv2.bitwise_or(mask1, mask2)
+        image[mask != 0] = [0, 0, 0]
+        return image
 
     def filter_by_size(self, image: np.ndarray) -> np.ndarray:
         contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         mask = np.zeros_like(image)
+        image_height, image_width = image.shape
+        image_area = image_height * image_width
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             area = w * h
-            if 1000 <= area <= 3000:
+
+            # skip contour of whole image
+            if abs(image_area - area) < image_area * 0.01:
+                continue
+
+            if image_height * 0.35 <= h:
                 cv2.rectangle(mask, (x, y), (x + w, y + h), (255), thickness=cv2.FILLED)
+
         result = cv2.bitwise_or(image, cv2.bitwise_not(mask))
         return result
