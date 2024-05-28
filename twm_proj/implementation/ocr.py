@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import tensorflow as tf
 
 from twm_proj.interface.ocr import IOcr
@@ -18,16 +19,14 @@ class Ocr(IOcr):
         for letter in letters:
             resized_image = cv2.resize(letter, (60, 80))
             img = np.expand_dims(resized_image, axis=0)
-
             predictions = self._model.predict(img, verbose=0)
-
             predicted_class_index = np.argmax(predictions)
 
             def index_to_label(index):
                 if 0 <= index < 26:
-                    return chr(index + ord('A'))
+                    return chr(index + ord("A"))
                 elif 26 <= index < 36:
-                    return chr(index - 26 + ord('0'))
+                    return chr(index - 26 + ord("0"))
                 else:
                     raise ValueError(f"Unsupported class index: {index}")
 

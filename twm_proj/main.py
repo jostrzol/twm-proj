@@ -31,8 +31,8 @@ def main():
         rect_detector=RectDetector(),
         rect_transformer=RectTransformer(),
         rect_classifier=RectClassifier(),
-        ocr=Ocr(model_path='models/ocr.keras'),
-        pre_ocr=PreOcr()
+        ocr=Ocr(model_path="models/ocr.keras"),
+        pre_ocr=PreOcr(),
     )
 
     for path in args.files:
