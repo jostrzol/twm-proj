@@ -37,6 +37,7 @@ class PreOcr(IPreOcr):
 
     def get_letters(self, image: np.ndarray):
         contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=lambda x: cv2.boundingRect(x)[0])
         image_height, image_width = image.shape
         image_area = image_height * image_width
         for contour in contours:
