@@ -8,6 +8,15 @@ from twm_proj.interface.ocr import IOcr
 from twm_proj.interface.pre_ocr import IPreOcr
 from twm_proj.interface.rect_classifier import IRectClassifier, RectangleType
 from twm_proj.interface.rect_transformer import IRectTransformer
+from twm_proj.implementation.contour_detector import ContourDetector
+from twm_proj.implementation.edge_filter import EdgeFilter
+from twm_proj.implementation.image_reader import ImageReader
+from twm_proj.implementation.initial_filter import InitialFilter
+from twm_proj.implementation.ocr import Ocr
+from twm_proj.implementation.pre_ocr import PreOcr
+from twm_proj.implementation.rect_classifier import RectClassifier
+from twm_proj.implementation.rect_detector import RectDetector
+from twm_proj.implementation.rect_transformer import RectTransformer
 
 from dataclasses import dataclass
 
@@ -44,8 +53,13 @@ class LicencePlateDetector:
         self._ocr = ocr
         self._pre_ocr = pre_ocr
 
-    def detect(self, image_file: BinaryIO) -> Generator[LicencePlate, Any, None]:
+    def read_and_detect(
+        self, image_file: BinaryIO
+    ) -> Generator[LicencePlate, Any, None]:
         image = self._image_reader.read(image_file)
+        return self.detect(image)
+
+    def detect(self, image: np.ndarray) -> Generator[LicencePlate, Any, None]:
         filtered = self._initial_filter.filter(image)
         edges = self._edge_filter.filter(filtered)
         for contour in self._contour_detector.detect(edges):
@@ -61,3 +75,17 @@ class LicencePlateDetector:
             letters = [*self._pre_ocr.get_letters(ocr_image_grayscale)]
             text = self._ocr.scan_text(letters)
             yield LicencePlate(rect=rect, image=rect_image, text=text)
+
+    @classmethod
+    def default(cls):
+        return cls(
+            image_reader=ImageReader(),
+            initial_filter=InitialFilter(),
+            edge_filter=EdgeFilter(),
+            contour_detector=ContourDetector(),
+            rect_detector=RectDetector(),
+            rect_transformer=RectTransformer(),
+            rect_classifier=RectClassifier(),
+            ocr=Ocr(model_path="models/ocr.keras"),
+            pre_ocr=PreOcr(),
+        )

@@ -5,15 +5,6 @@ import sys
 import numpy as np
 
 from argparse import ArgumentParser
-from twm_proj.implementation.contour_detector import ContourDetector
-from twm_proj.implementation.edge_filter import EdgeFilter
-from twm_proj.implementation.image_reader import ImageReader
-from twm_proj.implementation.initial_filter import InitialFilter
-from twm_proj.implementation.ocr import Ocr
-from twm_proj.implementation.pre_ocr import PreOcr
-from twm_proj.implementation.rect_classifier import RectClassifier
-from twm_proj.implementation.rect_detector import RectDetector
-from twm_proj.implementation.rect_transformer import RectTransformer
 
 from twm_proj.licence_plate_detector import LicencePlateDetector, LicencePlate
 
@@ -23,21 +14,11 @@ def main():
     parser.add_argument("files", nargs="+")
     args = parser.parse_args()
 
-    detector = LicencePlateDetector(
-        image_reader=ImageReader(),
-        initial_filter=InitialFilter(),
-        edge_filter=EdgeFilter(),
-        contour_detector=ContourDetector(),
-        rect_detector=RectDetector(),
-        rect_transformer=RectTransformer(),
-        rect_classifier=RectClassifier(),
-        ocr=Ocr(model_path="models/ocr.keras"),
-        pre_ocr=PreOcr(),
-    )
+    detector = LicencePlateDetector.default()
 
     for path in args.files:
         with open(path, "rb") as file:
-            plates = [*detector.detect(file)]
+            plates = [*detector.read_and_detect(file)]
         result = {"file": path, "plates": plates}
         json.dump(result, sys.stdout, cls=CustomJSONEncoder)
         print()
