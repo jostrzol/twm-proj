@@ -35,17 +35,8 @@ class PreOcr(IPreOcr):
         image[mask != 0] = [0, 0, 0]
         return image
 
-    # def _is_same_color(self, region, threshold=0.7):
-    #     pixels = region.reshape(-1, region.shape[-1])
-    #     color_counts = Counter(map(tuple, pixels))
-    #     _, count = color_counts.most_common(1)[0]
-    #     percentage = count / pixels.shape[0]
-    #     print(percentage)
-    #     return percentage >= threshold
-    
     def get_letters(self, image: np.ndarray):
         contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        mask = np.zeros_like(image)
         image_height, image_width = image.shape
         image_area = image_height * image_width
         for contour in contours:
@@ -56,10 +47,6 @@ class PreOcr(IPreOcr):
             if abs(image_area - area) < image_area * 0.01:
                 continue
 
-            cut = image[y:y+h, x:x+w]
-            if image_height * 0.35 <= h:
+            cut = image[y : y + h, x : x + w]
+            if image_height * 0.35 <= h and image_height * image_width * 0.03 <= h * w:
                 yield cut
-                # cv2.rectangle(mask, (x, y), (x + w, y + h), (255), thickness=cv2.FILLED)
-
-        # result = cv2.bitwise_or(image, cv2.bitwise_not(mask))
-        # return result

@@ -58,6 +58,6 @@ class LicencePlateDetector:
                 continue
             ocr_image_cut = self._pre_ocr.cut(rect_image)
             ocr_image_grayscale = self._pre_ocr.to_grayscale(ocr_image_cut)
-            ocr_image_filtered = self._pre_ocr.filter_by_size(ocr_image_grayscale)
-            text = self._ocr.scan_text(ocr_image_filtered)
+            letters = [*self._pre_ocr.get_letters(ocr_image_grayscale)]
+            text = self._ocr.scan_text(letters)
             yield LicencePlate(rect=rect, image=rect_image, text=text)
