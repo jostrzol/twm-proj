@@ -7,6 +7,9 @@ import tensorflow as tf
 
 from twm_proj.interface.ocr import IOcr
 
+OCR_IMAGE_WIDTH = 32
+OCR_IMAGE_HEIGHT = 32
+
 
 class Ocr(IOcr):
 
@@ -17,7 +20,7 @@ class Ocr(IOcr):
     def scan_text(self, letters: list[np.ndarray]) -> str:
         predicted_text = ""
         for letter in letters:
-            resized_image = cv2.resize(letter, (60, 80))
+            resized_image = cv2.resize(letter, (OCR_IMAGE_WIDTH, OCR_IMAGE_HEIGHT))
             img = np.expand_dims(resized_image, axis=0)
             predictions = self._model.predict(img, verbose=0)
             predicted_class_index = np.argmax(predictions)
