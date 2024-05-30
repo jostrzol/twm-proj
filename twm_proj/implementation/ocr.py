@@ -7,8 +7,8 @@ import tensorflow as tf
 
 from twm_proj.interface.ocr import IOcr
 
-OCR_IMAGE_WIDTH = 32
-OCR_IMAGE_HEIGHT = 32
+OCR_IMAGE_WIDTH = 64
+OCR_IMAGE_HEIGHT = 64
 
 
 class Ocr(IOcr):
