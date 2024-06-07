@@ -1,8 +1,9 @@
+from subprocess import run
+
 import cv2
 import numpy as np
-
-from matplotlib import pyplot as plt
 import seaborn_image as isns
+from matplotlib import pyplot as plt
 
 
 def show(image: np.ndarray):
@@ -26,5 +27,20 @@ def show_contours(image: np.ndarray, contours: np.ndarray):
 
 
 def show_collage(images: list[np.ndarray], col_wrap: int = 5, height: float = 3):
-    reversed = [img[..., ::-1] for img in images]
-    isns.ImageGrid(reversed, col_wrap=col_wrap, cbar=False, cmap="hsv", height=height)
+    if len(images) == 0:
+        return
+
+    if len(images[0].shape) == 2:
+        cmap = "gray"
+    else:
+        cmap = "hsv"
+        images = [img[..., ::-1] for img in images]
+
+    isns.ImageGrid(images, col_wrap=col_wrap, cbar=False, cmap=cmap, height=height)
+
+
+def git_root() -> str:
+    result = run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True
+    )
+    return result.stdout

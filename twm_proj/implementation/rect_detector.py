@@ -15,7 +15,7 @@ class RectDetector(IRectDetector):
         return coords[indices]
 
     def detect(self, contour: np.ndarray) -> np.ndarray | None:
-        rect = cv2.approxPolyDP(contour, epsilon=70.0, closed=True)
+        rect = cv2.approxPolyDP(contour, epsilon=20.0, closed=True)
         if len(rect) != 4:
             return None
         return self._sort_coordinates(rect).reshape(-1, 2)

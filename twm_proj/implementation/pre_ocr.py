@@ -1,4 +1,3 @@
-from collections import Counter
 import cv2
 import numpy as np
 
@@ -9,7 +8,10 @@ ASPECT_RATIO = 60 / 80
 
 class PreOcr(IPreOcr):
 
+    # TODO: delete this? plate detector is not that
+    # accurate anyways
     def cut(self, image: np.ndarray) -> np.ndarray:
+        return image
         # TODO: cut based on plate shape type
         left = 20
         right = 5

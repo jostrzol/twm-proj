@@ -13,7 +13,7 @@ OCR_IMAGE_HEIGHT = 64
 
 class Ocr(IOcr):
 
-    def __init__(self, model_path="../models/ocr.keras"):
+    def __init__(self, model_path="./models/ocr.keras"):
         model = tf.keras.models.load_model(model_path)
         self._model = model
 
