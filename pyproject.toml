@@ -19,6 +19,7 @@ tensorflow = "2.15.0"
 pylabel = "^0.1.55"
 seaborn-image = "^0.9.0"
 shapely = "^2.0.4"
+wrapt = ">=1.11.0,<1.15"
 
 [tool.poetry.scripts]
 main = "twm_proj.main:main"

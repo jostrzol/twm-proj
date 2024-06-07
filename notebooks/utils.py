@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import seaborn_image as isns
 from matplotlib import pyplot as plt
+import os
 
 
 def show(image: np.ndarray):
@@ -43,4 +44,8 @@ def git_root() -> str:
     result = run(
         ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True
     )
-    return result.stdout
+    return result.stdout.strip()
+
+
+def cd_git_root():
+    os.chdir(git_root())
