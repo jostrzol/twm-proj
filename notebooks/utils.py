@@ -7,11 +7,10 @@ from matplotlib import pyplot as plt
 import os
 
 
-def show(image: np.ndarray):
-    [height, width, *_] = image.shape
-    aspect = width / height
-    size = np.array([aspect, 1])
-    size = size / size.max() * 4
+def show(image: np.ndarray, height: float = 6):
+    [img_height, img_width, *_] = image.shape
+    aspect = img_width / img_height
+    size = np.array([height * aspect, height])
     fig = plt.figure(figsize=size)
     ax = fig.add_subplot(1, 1, 1)
     if len(image.shape) == 2:
@@ -22,9 +21,9 @@ def show(image: np.ndarray):
     plt.show()
 
 
-def show_contours(image: np.ndarray, contours: np.ndarray):
+def show_contours(image: np.ndarray, contours: np.ndarray, height: float = 6):
     contours_image = cv2.drawContours(np.copy(image), contours, -1, (0, 0, 255), 2)
-    show(contours_image)
+    show(contours_image, height=height)
 
 
 def show_collage(images: list[np.ndarray], col_wrap: int = 5, height: float = 3):
