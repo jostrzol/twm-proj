@@ -6,24 +6,8 @@ from twm_proj.interface.edge_filter import IEdgeFilter
 
 class EdgeFilter(IEdgeFilter):
     def filter(self, image: np.ndarray) -> np.ndarray:
-        image = cv2.adaptiveThreshold(
-            image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 57, -15
-        )
-
-        kernel = self._gaussian_kernel(3, 1)
-        image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-
-        kernel = self._gaussian_kernel(11, 2)
-        image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
-
-        kernel = self._vert_line_kernel(8, 6)
-        image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-
-        kernel = self._horiz_line_kernel(6, 4)
-        image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-
-        kernel = self._gaussian_kernel(7, 2)
-        image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+        image = cv2.edgePreservingFilter(image, flags=1, sigma_s=30, sigma_r=0.15)
+        image = cv2.Canny(image, 20, 100)
         return image
 
     @staticmethod
