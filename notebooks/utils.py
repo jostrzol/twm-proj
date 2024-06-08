@@ -9,7 +9,7 @@ from typing import Iterable
 import matplotlib
 
 
-def show(image: np.ndarray, height: float = 30):
+def show(image: np.ndarray, height: float = 10):
     [img_height, img_width, *_] = image.shape
     aspect = img_width / img_height
     size = np.array([height * aspect, height])
@@ -26,7 +26,7 @@ def show(image: np.ndarray, height: float = 30):
 def show_contours(
     image: np.ndarray,
     contours: list[np.ndarray],
-    height: float = 30,
+    height: float = 10,
     n_colors: int = 8,
     thickness: int = 3,
 ):
@@ -46,7 +46,7 @@ def show_collage(
     col_wrap: int = 5,
     height: float = 3,
     texts: Iterable[str] | None = [],
-):
+) -> isns.ImageGrid:
     if len(images) == 0:
         return
 
@@ -63,6 +63,7 @@ def show_collage(
         texts = []
     for axes, text in zip(grid.axes.flat, texts):
         axes.set_title(text)
+    return grid
 
 
 def git_root() -> str:
