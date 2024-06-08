@@ -20,6 +20,8 @@ pylabel = "^0.1.55"
 seaborn-image = "^0.9.0"
 shapely = "^2.0.4"
 wrapt = ">=1.11.0,<1.15"
+python-levenshtein = "^0.25.1"
+seaborn = "^0.13.2"
 
 [tool.poetry.scripts]
 main = "twm_proj.main:main"
