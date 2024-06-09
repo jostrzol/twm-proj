@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 
 from twm_proj.interface.pre_ocr import IPreOcr
+from twm_proj.interface.rect_classifier import RectangleType
 
 ASPECT_RATIO = 60 / 80
 
@@ -55,11 +56,20 @@ class PreOcr(IPreOcr):
         blank_image[start_y:end_y, start_x:end_x] = image
         return blank_image
 
-    def get_letters(self, image: np.ndarray):
+    def get_letters(self, image: np.ndarray, plate_cls: RectangleType):
         contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours = sorted(contours, key=lambda x: cv2.boundingRect(x)[0])
         image_height, image_width = image.shape
         image_area = image_height * image_width
+        # sort contours based on their center
+        # sort left-right
+        contours = sorted(contours, key=lambda x: cv2.minEnclosingCircle(x)[0][0])
+        # sort up-down (roughly - upper/lower part of the image)
+        # note: sort is stable and the order will be maintained in the next step
+        if plate_cls == RectangleType.TWO_ROW_PLATE:
+            contours = sorted(
+                contours,
+                key=lambda x: cv2.minEnclosingCircle(x)[0][1] > image_height / 2,
+            )
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             area = w * h

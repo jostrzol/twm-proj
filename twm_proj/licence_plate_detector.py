@@ -72,7 +72,7 @@ class LicencePlateDetector:
                 continue
             ocr_image_cut = self._pre_ocr.cut(rect_image)
             ocr_image_grayscale = self._pre_ocr.to_grayscale(ocr_image_cut)
-            letters = [*self._pre_ocr.get_letters(ocr_image_grayscale)]
+            letters = [*self._pre_ocr.get_letters(ocr_image_grayscale, rect_type)]
             text = self._ocr.scan_text(letters)
             if text == "":
                 continue
