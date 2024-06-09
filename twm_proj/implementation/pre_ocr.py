@@ -15,7 +15,10 @@ class PreOcr(IPreOcr):
         image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, img = cv2.threshold(gray, 81, 255, cv2.THRESH_BINARY)
+        _, img = cv2.threshold(gray, 76, 255, cv2.THRESH_BINARY)
+        # img = cv2.adaptiveThreshold(
+        #     gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 28
+        # )
         return img
 
     def expand(self, image: np.ndarray) -> np.ndarray:
@@ -30,6 +33,11 @@ class PreOcr(IPreOcr):
         return blank_image
 
     def filter_grayscale(self, image: np.ndarray) -> np.ndarray:
+        # for very low res plates skip morphology
+        _, image_width = image.shape
+        if image_width < 100:
+            return image
+
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
         plate_filtered = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
 
@@ -76,14 +84,15 @@ class PreOcr(IPreOcr):
         contours = sorted(contours, key=lambda x: cv2.minEnclosingCircle(x)[0][0])
         # sort up-down (roughly - upper/lower part of the image)
         # note: sort is stable and the order will be maintained in the next step
-        two_row_multiplier = 1
+        min_height_ratio = 0.58
+        max_width_ratio = 0.4
         if plate_cls == RectangleType.TWO_ROW_PLATE:
             contours = sorted(
                 contours,
                 key=lambda x: cv2.minEnclosingCircle(x)[0][1] > image_height / 2,
             )
             # letter height is not compared to full img_height
-            two_row_multiplier = 0.6
+            min_height_ratio = 0.33
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             area = w * h
@@ -94,7 +103,8 @@ class PreOcr(IPreOcr):
 
             cut = image[y : y + h, x : x + w]
             if (
-                image_height * 0.55 * two_row_multiplier <= h
+                image_height * min_height_ratio <= h
+                and image_width * max_width_ratio >= w
                 and image_height * image_width * 0.03 <= h * w
             ):
                 yield self._expand_width(cut)
