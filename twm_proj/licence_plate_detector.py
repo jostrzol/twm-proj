@@ -78,7 +78,8 @@ class LicencePlateDetector:
             if self._rect_deduplicator.is_dupe(rect):
                 continue
             ocr_image_grayscale = self._pre_ocr.to_grayscale(rect_image)
-            ocr_image_filtered = self._pre_ocr.filter_grayscale(ocr_image_grayscale)
+            ocr_image_expanded = self._pre_ocr.expand(ocr_image_grayscale)
+            ocr_image_filtered = self._pre_ocr.filter_grayscale(ocr_image_expanded)
             letters = [*self._pre_ocr.get_letters(ocr_image_filtered, rect_type)]
             text = self._ocr.scan_text(letters)
             if text == "":

@@ -15,12 +15,26 @@ class PreOcr(IPreOcr):
         image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, img = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
+        _, img = cv2.threshold(gray, 81, 255, cv2.THRESH_BINARY)
         return img
 
+    def expand(self, image: np.ndarray) -> np.ndarray:
+        image_height, image_width = image.shape[:2]
+        new_height, new_width = image_height + 4, image_width + 4
+        blank_image = 255 * np.ones((new_height, new_width), np.uint8)
+        start_y = (new_height - image_height) // 2
+        start_x = (new_width - image_width) // 2
+        end_y = start_y + image_height
+        end_x = start_x + image_width
+        blank_image[start_y:end_y, start_x:end_x] = image
+        return blank_image
+
     def filter_grayscale(self, image: np.ndarray) -> np.ndarray:
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-        plate_filtered = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+        plate_filtered = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
+        
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        plate_filtered = cv2.morphologyEx(plate_filtered, cv2.MORPH_CLOSE, kernel)
         return plate_filtered
 
     def _convert_reds(self, image: np.ndarray) -> np.ndarray:
