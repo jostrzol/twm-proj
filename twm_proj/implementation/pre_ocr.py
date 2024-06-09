@@ -9,22 +9,19 @@ ASPECT_RATIO = 60 / 80
 
 class PreOcr(IPreOcr):
 
-    # TODO: delete this? plate detector is not that
-    # accurate anyways
-    def cut(self, image: np.ndarray) -> np.ndarray:
-        return image
-        # TODO: cut based on plate shape type
-        left = 20
-        right = 5
-        top = 10
-        bottom = 8
-        return image[top:-bottom, left:-right]
-
     def to_grayscale(self, image: np.ndarray) -> np.ndarray:
+        img_yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+        img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
+        image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, img = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
         return img
+
+    def filter_grayscale(self, image: np.ndarray) -> np.ndarray:
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        plate_filtered = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+        return plate_filtered
 
     def _convert_reds(self, image: np.ndarray) -> np.ndarray:
         # Converts reds to blacks (special case for temporary plates)
@@ -79,5 +76,5 @@ class PreOcr(IPreOcr):
                 continue
 
             cut = image[y : y + h, x : x + w]
-            if image_height * 0.35 <= h and image_height * image_width * 0.03 <= h * w:
+            if image_height * 0.55 <= h and image_height * image_width * 0.03 <= h * w:
                 yield self._expand_width(cut)
