@@ -7,6 +7,7 @@ from twm_proj.interface.initial_filter import IInitialFilter
 from twm_proj.interface.ocr import IOcr
 from twm_proj.interface.pre_ocr import IPreOcr
 from twm_proj.interface.rect_classifier import IRectClassifier, RectangleType
+from twm_proj.interface.rect_deduplicator import IRectDeduplicator
 from twm_proj.interface.rect_transformer import IRectTransformer
 from twm_proj.implementation.contour_detector import ContourDetector
 from twm_proj.implementation.edge_filter import EdgeFilter
@@ -15,6 +16,7 @@ from twm_proj.implementation.initial_filter import InitialFilter
 from twm_proj.implementation.ocr import Ocr
 from twm_proj.implementation.pre_ocr import PreOcr
 from twm_proj.implementation.rect_classifier import RectClassifier
+from twm_proj.implementation.rect_deduplicator import RectDeduplicator
 from twm_proj.implementation.rect_detector import RectDetector
 from twm_proj.implementation.rect_transformer import RectTransformer
 
@@ -40,6 +42,7 @@ class LicencePlateDetector:
         rect_detector: IRectDetector,
         rect_transformer: IRectTransformer,
         rect_classifier: IRectClassifier,
+        rect_deduplicator: IRectDeduplicator,
         pre_ocr: IPreOcr,
         ocr: IOcr,
     ):
@@ -50,6 +53,7 @@ class LicencePlateDetector:
         self._rect_detector = rect_detector
         self._rect_transformer = rect_transformer
         self._rect_classifier = rect_classifier
+        self._rect_deduplicator = rect_deduplicator
         self._ocr = ocr
         self._pre_ocr = pre_ocr
 
@@ -60,6 +64,7 @@ class LicencePlateDetector:
         return self.detect(image)
 
     def detect(self, image: np.ndarray) -> Generator[LicencePlate, Any, None]:
+        self._rect_deduplicator.reset()
         filtered = self._initial_filter.filter(image)
         edges = self._edge_filter.filter(filtered)
         for contour in self._contour_detector.detect(edges):
@@ -69,6 +74,8 @@ class LicencePlateDetector:
             rect_image = self._rect_transformer.transform(image, rect)
             rect_type = self._rect_classifier.classify(rect_image)
             if rect_type == RectangleType.NOT_PLATE:
+                continue
+            if self._rect_deduplicator.is_dupe(rect):
                 continue
             ocr_image_cut = self._pre_ocr.cut(rect_image)
             ocr_image_grayscale = self._pre_ocr.to_grayscale(ocr_image_cut)
@@ -88,6 +95,7 @@ class LicencePlateDetector:
             rect_detector=RectDetector(),
             rect_transformer=RectTransformer(),
             rect_classifier=RectClassifier(),
+            rect_deduplicator=RectDeduplicator(),
             ocr=Ocr(model_path="models/ocr.keras"),
             pre_ocr=PreOcr(),
         )
