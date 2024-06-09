@@ -32,7 +32,7 @@ class PreOcr(IPreOcr):
     def filter_grayscale(self, image: np.ndarray) -> np.ndarray:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
         plate_filtered = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-        
+
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
         plate_filtered = cv2.morphologyEx(plate_filtered, cv2.MORPH_CLOSE, kernel)
         return plate_filtered
@@ -76,11 +76,14 @@ class PreOcr(IPreOcr):
         contours = sorted(contours, key=lambda x: cv2.minEnclosingCircle(x)[0][0])
         # sort up-down (roughly - upper/lower part of the image)
         # note: sort is stable and the order will be maintained in the next step
+        two_row_multiplier = 1
         if plate_cls == RectangleType.TWO_ROW_PLATE:
             contours = sorted(
                 contours,
                 key=lambda x: cv2.minEnclosingCircle(x)[0][1] > image_height / 2,
             )
+            # letter height is not compared to full img_height
+            two_row_multiplier = 0.6
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             area = w * h
@@ -90,5 +93,8 @@ class PreOcr(IPreOcr):
                 continue
 
             cut = image[y : y + h, x : x + w]
-            if image_height * 0.55 <= h and image_height * image_width * 0.03 <= h * w:
+            if (
+                image_height * 0.55 * two_row_multiplier <= h
+                and image_height * image_width * 0.03 <= h * w
+            ):
                 yield self._expand_width(cut)
