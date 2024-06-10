@@ -13,6 +13,7 @@ class PreOcr(IPreOcr):
         img_yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
         img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
         image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
+        image = self._convert_yellows(image)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, img = cv2.threshold(gray, 76, 255, cv2.THRESH_BINARY)
@@ -50,13 +51,22 @@ class PreOcr(IPreOcr):
         # Because of this, we can use stronger treshold
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         lower_red = np.array([0, 55, 50])
-        upper_red = np.array([25, 255, 255])
+        upper_red = np.array([20, 255, 255])
         lower_red2 = np.array([160, 55, 100])
         upper_red2 = np.array([190, 255, 255])
         mask1 = cv2.inRange(hsv, lower_red, upper_red)
         mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
         mask = cv2.bitwise_or(mask1, mask2)
         image[mask != 0] = [0, 0, 0]
+        return image
+    
+    def _convert_yellows(self, image: np.ndarray) -> np.ndarray:
+        # Converts yellows to whites (special case for special plates)
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        lower_yellow = np.array([20, 60, 60])
+        upper_yellow = np.array([55, 255, 255])
+        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+        image[mask != 0] = [255, 255, 255]
         return image
 
     # train images are 80x60, so maintain that aspect ratio
