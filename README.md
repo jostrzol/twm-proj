@@ -5,7 +5,6 @@
 ```sh
 python3.10 -m venv venv
 source venv/bin/activate
-poetry install
 pip install poetry
 poetry install
 ```
