@@ -22,6 +22,8 @@ class RectDetector(IRectDetector):
         poly_contour = Polygon(contour)
         poly_rect = Polygon(rect)
         intersection = poly_contour.intersection(poly_rect)
+        if poly_contour.area <= 1e-3:
+            return None
         if (poly_rect.area / poly_rect.minimum_rotated_rectangle.area) < 0.8:
             return None
         if intersection.area / poly_contour.area < 0.9:
