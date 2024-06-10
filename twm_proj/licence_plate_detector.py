@@ -71,11 +71,11 @@ class LicencePlateDetector:
             rect = self._rect_detector.detect(contour)
             if rect is None:
                 continue
+            if self._rect_deduplicator.is_dupe(rect):
+                continue
             rect_image = self._rect_transformer.transform(image, rect)
             rect_type = self._rect_classifier.classify(rect_image)
             if rect_type == RectangleType.NOT_PLATE:
-                continue
-            if self._rect_deduplicator.is_dupe(rect):
                 continue
             ocr_image_grayscale = self._pre_ocr.to_grayscale(rect_image)
             ocr_image_expanded = self._pre_ocr.expand(ocr_image_grayscale)
