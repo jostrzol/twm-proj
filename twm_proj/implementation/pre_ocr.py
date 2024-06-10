@@ -59,7 +59,7 @@ class PreOcr(IPreOcr):
         mask = cv2.bitwise_or(mask1, mask2)
         image[mask != 0] = [0, 0, 0]
         return image
-    
+
     def _convert_yellows(self, image: np.ndarray) -> np.ndarray:
         # Converts yellows to whites (special case for special plates)
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
