@@ -10,16 +10,12 @@ ASPECT_RATIO = 60 / 80
 class PreOcr(IPreOcr):
 
     def to_grayscale(self, image: np.ndarray) -> np.ndarray:
-        img_yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-        img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
-        image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
         image = self._convert_yellows(image)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, img = cv2.threshold(gray, 76, 255, cv2.THRESH_BINARY)
-        # img = cv2.adaptiveThreshold(
-        #     gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 28
-        # )
+        otsu_thresh, _ = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        otsu_thresh -= 5 # manually decrease black selection
+        _, img = cv2.threshold(gray, otsu_thresh, 255, cv2.THRESH_BINARY)
         return img
 
     def expand(self, image: np.ndarray) -> np.ndarray:
@@ -42,17 +38,17 @@ class PreOcr(IPreOcr):
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
         plate_filtered = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
 
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-        plate_filtered = cv2.morphologyEx(plate_filtered, cv2.MORPH_CLOSE, kernel)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+        plate_filtered = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
         return plate_filtered
 
     def _convert_reds(self, image: np.ndarray) -> np.ndarray:
         # Converts reds to blacks (special case for temporary plates)
         # Because of this, we can use stronger treshold
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        lower_red = np.array([0, 55, 50])
+        lower_red = np.array([0, 60, 50])
         upper_red = np.array([20, 255, 255])
-        lower_red2 = np.array([160, 55, 100])
+        lower_red2 = np.array([160, 60, 100])
         upper_red2 = np.array([190, 255, 255])
         mask1 = cv2.inRange(hsv, lower_red, upper_red)
         mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
@@ -94,7 +90,7 @@ class PreOcr(IPreOcr):
         contours = sorted(contours, key=lambda x: cv2.minEnclosingCircle(x)[0][0])
         # sort up-down (roughly - upper/lower part of the image)
         # note: sort is stable and the order will be maintained in the next step
-        min_height_ratio = 0.58
+        min_height_ratio = 0.57
         max_width_ratio = 0.4
         if plate_cls == RectangleType.TWO_ROW_PLATE:
             contours = sorted(
