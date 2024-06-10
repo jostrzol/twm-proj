@@ -13,8 +13,10 @@ class PreOcr(IPreOcr):
         image = self._convert_yellows(image)
         image = self._convert_reds(image)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        otsu_thresh, _ = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        otsu_thresh -= 5 # manually decrease black selection
+        otsu_thresh, _ = cv2.threshold(
+            gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
+        otsu_thresh -= 5  # manually decrease black selection
         _, img = cv2.threshold(gray, otsu_thresh, 255, cv2.THRESH_BINARY)
         return img
 

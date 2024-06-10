@@ -5,5 +5,4 @@ import numpy as np
 
 
 class IImageReader(metaclass=ABCMeta):
-    def read(self, file: BinaryIO) -> np.ndarray:
-        ...
+    def read(self, file: BinaryIO) -> np.ndarray: ...
