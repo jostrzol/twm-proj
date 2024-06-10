@@ -7,6 +7,7 @@ import numpy as np
 from argparse import ArgumentParser
 
 from twm_proj.licence_plate_detector import LicencePlateDetector, LicencePlate
+from twm_proj.interface.rect_classifier import RectangleType
 
 
 def main():
@@ -34,6 +35,8 @@ class CustomJSONEncoder(json.JSONEncoder):
             return dataclasses.asdict(o)
         elif isinstance(o, np.ndarray):
             return o.tolist()
+        elif isinstance(o, RectangleType):
+            return str(o).split(".")[-1]
         return super().default(o)
 
 

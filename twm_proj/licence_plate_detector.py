@@ -30,6 +30,7 @@ class LicencePlate:
     text: str
     rect: np.ndarray
     image: np.ndarray
+    type: RectangleType
 
 
 class LicencePlateDetector:
@@ -84,7 +85,7 @@ class LicencePlateDetector:
             text = self._ocr.scan_text(letters)
             if text == "":
                 continue
-            yield LicencePlate(rect=rect, image=rect_image, text=text)
+            yield LicencePlate(rect=rect, image=rect_image, text=text, type=rect_type)
 
     @classmethod
     def default(cls):
